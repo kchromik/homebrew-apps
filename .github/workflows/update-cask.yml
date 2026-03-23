@@ -1,0 +1,57 @@
+name: Update Cask
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version (e.g. 1.9.2)"
+        required: true
+      download_url:
+        description: "Direct download URL to the .dmg file"
+        required: true
+
+  repository_dispatch:
+    types: [update-cask]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "version=${{ github.event.client_payload.version }}" >> "$GITHUB_OUTPUT"
+            echo "download_url=${{ github.event.client_payload.download_url }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "download_url=${{ github.event.inputs.download_url }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download release artifact
+        run: |
+          curl -L -o release.dmg "${{ steps.vars.outputs.download_url }}"
+
+      - name: Calculate SHA-256
+        id: sha
+        run: |
+          SHA=$(shasum -a 256 release.dmg | awk '{print $1}')
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+          echo "SHA-256: $SHA"
+
+      - name: Update Cask file
+        run: |
+          CASK_FILE="Casks/w/whisper-bar.rb"
+          sed -i "s/version \".*\"/version \"${{ steps.vars.outputs.version }}\"/" "$CASK_FILE"
+          sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha.outputs.sha256 }}\"/" "$CASK_FILE"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/w/whisper-bar.rb
+          git commit -m "whisper-bar ${{ steps.vars.outputs.version }}"
+          git push
