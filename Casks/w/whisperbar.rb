@@ -1,4 +1,4 @@
-cask "whisper-bar" do
+cask "whisperbar" do
   version "1.9.2"
   sha256 "e4db3e7b38131b668773fcfa3375dfcfecfe139f89ed213b56691e83c82543cc"
 

@@ -6,25 +6,25 @@ Homebrew Cask formulae for WhisperBar.
 
 ```sh
 brew tap kchromik/apps
-brew install whisper-bar
+brew install whisperbar
 ```
 
 Or as a one-liner:
 
 ```sh
-brew install kchromik/apps/whisper-bar
+brew install kchromik/apps/whisperbar
 ```
 
 ## Update
 
 ```sh
-brew upgrade whisper-bar
+brew upgrade whisperbar
 ```
 
 ## Uninstall
 
 ```sh
-brew uninstall whisper-bar
+brew uninstall whisperbar
 ```
 
 ## About WhisperBar

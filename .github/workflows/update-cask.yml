@@ -44,7 +44,7 @@ jobs:
 
       - name: Update Cask file
         run: |
-          CASK_FILE="Casks/w/whisper-bar.rb"
+          CASK_FILE="Casks/w/whisperbar.rb"
           sed -i "s/version \".*\"/version \"${{ steps.vars.outputs.version }}\"/" "$CASK_FILE"
           sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha.outputs.sha256 }}\"/" "$CASK_FILE"
 
@@ -52,6 +52,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Casks/w/whisper-bar.rb
-          git commit -m "whisper-bar ${{ steps.vars.outputs.version }}"
+          git add Casks/w/whisperbar.rb
+          git commit -m "whisperbar ${{ steps.vars.outputs.version }}"
           git push
