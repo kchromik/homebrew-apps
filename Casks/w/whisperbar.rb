@@ -2,8 +2,7 @@ cask "whisperbar" do
   version "1.18.1"
   sha256 "cbe80ac186b8634c06b783f4157dad68b6730771202c6ecc057412a2dc290b2a"
 
-  url "https://github.com/kchromik/shoutflow-releases/releases/download/v#{version}/WhisperBar-#{version}.dmg",
-      verified: "github.com/kchromik/shoutflow-releases/"
+  url "https://github.com/kchromik/shoutflow-releases/releases/download/v#{version}/WhisperBar-#{version}.dmg"
   name "WhisperBar"
   desc "Menu bar speech-to-text powered by whisper.cpp, running entirely on-device"
   homepage "https://whisperbar.app/"
