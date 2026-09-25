@@ -1,6 +1,6 @@
 cask "whisperbar" do
-  version "1.19.1"
-  sha256 "565f6e2d5b2744f91b5ffb1a52ab27536490b486055738f8f391f799afcdbe3f"
+  version "1.20.0"
+  sha256 "223eb587cb73265ed2df75d288dd1ef7f39d7245cf0e9ccab9a7c39310059d15"
 
   url "https://github.com/kchromik/shoutflow-releases/releases/download/v#{version}/WhisperBar-#{version}.dmg"
   name "WhisperBar"
