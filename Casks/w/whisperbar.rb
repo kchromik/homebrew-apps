@@ -4,14 +4,15 @@ cask "whisperbar" do
 
   url "https://github.com/kchromik/shoutflow-releases/releases/download/v#{version}/WhisperBar-#{version}.dmg"
   name "WhisperBar"
-  desc "Menu bar speech-to-text powered by whisper.cpp, running entirely on-device"
-  homepage "https://whisperbar.app/"
+  desc "Local speech-to-text and meeting transcription"
+  homepage "https://whisperbar.pro/"
 
   livecheck do
     url :url
     strategy :github_latest
   end
 
+  depends_on arch: :arm64
   depends_on macos: :sequoia
 
   app "WhisperBar.app"
