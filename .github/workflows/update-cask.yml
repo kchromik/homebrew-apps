@@ -1,17 +1,20 @@
-name: Update Cask
+name: Update WhisperBar Cask
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "New version (e.g. 1.9.2)"
+        description: "Stable Apple Silicon version (e.g. 1.20.1)"
         required: true
       download_url:
-        description: "Direct download URL to the .dmg file"
+        description: "GitHub download URL to the WhisperBar DMG"
         required: true
-
   repository_dispatch:
     types: [update-cask]
+
+concurrency:
+  group: whisperbar-cask-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -19,41 +22,27 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Set variables
-        id: vars
-        run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "version=${{ github.event.client_payload.version }}" >> "$GITHUB_OUTPUT"
-            echo "download_url=${{ github.event.client_payload.download_url }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
-            echo "download_url=${{ github.event.inputs.download_url }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Checkout repository
+      - name: Checkout current main
         uses: actions/checkout@v5
-
-      - name: Download release artifact
-        run: |
-          curl -L -o release.dmg "${{ steps.vars.outputs.download_url }}"
-
-      - name: Calculate SHA-256
-        id: sha
-        run: |
-          SHA=$(shasum -a 256 release.dmg | awk '{print $1}')
-          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
-          echo "SHA-256: $SHA"
-
-      - name: Update Cask file
-        run: |
-          CASK_FILE="Casks/w/whisperbar.rb"
-          sed -i "s/version \".*\"/version \"${{ steps.vars.outputs.version }}\"/" "$CASK_FILE"
-          sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha.outputs.sha256 }}\"/" "$CASK_FILE"
-
+        with:
+          ref: main
+      - name: Test release guards
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Verify release and update cask
+        id: update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/update_cask.py
       - name: Commit and push
+        env:
+          WHISPERBAR_VERSION: ${{ steps.update.outputs.version }}
         run: |
+          if git diff --quiet -- Casks/w/whisperbar.rb; then
+            echo "Cask is already up to date."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Casks/w/whisperbar.rb
-          git commit -m "whisperbar ${{ steps.vars.outputs.version }}"
-          git push
+          git commit -m "WhisperBar ${WHISPERBAR_VERSION}"
+          git push origin HEAD:main
